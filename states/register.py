@@ -1,6 +1,6 @@
 from aiogram.fsm.state import State, StatesGroup
 
-class Registration(StatesGroup):
+class RegisterState(StatesGroup):
     name = State()
     birthdate = State()
     phone = State()

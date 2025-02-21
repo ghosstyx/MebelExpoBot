@@ -1,23 +1,36 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-
 from config import GOOGLE_SHEET_ID
+import os
 
-# Авторизация через Google API
+
 def authorize_google_sheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+
+    if not os.path.exists("C:/Users/xulka/PycharmProjects/MebelExpoBot/credentials.json"):
+        raise FileNotFoundError("Файл credentials.json не найден. Проверь путь к файлу.")
+
+    creds = ServiceAccountCredentials.from_json_keyfile_name("C:/Users/xulka/PycharmProjects/MebelExpoBot/credentials.json", scope)
     client = gspread.authorize(creds)
     return client
 
-# Получаем таблицу
 def get_sheet():
-    client = authorize_google_sheets()
-    sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1  # Открываем первый лист
-    return sheet
+    try:
+        client = authorize_google_sheets()
+        sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1  # Открываем первый лист
+        return sheet
+    except gspread.exceptions.SpreadsheetNotFound:
+        raise ValueError("Ошибка: Таблица не найдена. Проверь GOOGLE_SHEET_ID.")
+    except Exception as e:
+        raise RuntimeError(f"Ошибка при получении таблицы: {e}")
 
-# Функция для добавления данных в таблицу
 def add_visitor_data(user_id, name, birth_date, phone, photo_url):
     sheet = get_sheet()
     row = [user_id, name, birth_date, phone, photo_url, "Не использована"]
-    sheet.append_row(row)  # Добавляем строку в таблицу
+
+    try:
+        sheet.append_row(row)
+        print("Данные успешно добавлены в Google Sheets.")
+    except Exception as e:
+        raise RuntimeError(f"Ошибка при добавлении данных: {e}")
+

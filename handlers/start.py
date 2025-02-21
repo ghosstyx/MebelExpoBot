@@ -1,11 +1,13 @@
-from loader import dp
+from aiogram import Router, Bot, types
 from aiogram.filters import Command
-from aiogram import types
+from aiogram.types import Message
 
+start_router = Router()  # Создаём роутер
 
-user_data = {}
-
-@dp.message(Command("start"))
-async def start(message: types.Message):
-    user_data[message.from_user.id] = {}
-    await message.answer("Привет! Давай зарегистрируем тебя для получения 25% скидки.")
+@start_router.message(Command("start"))
+async def start_command(message: Message, bot: Bot):
+    await message.answer(
+        "Привет! 👋\n"
+        "Я бот для регистрации посетителей стенда INFINITY на MebelExpo 2025.\n"
+        "Нажми /register, чтобы начать регистрацию."
+    )
