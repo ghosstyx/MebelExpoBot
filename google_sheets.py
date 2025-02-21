@@ -24,13 +24,19 @@ def get_sheet():
     except Exception as e:
         raise RuntimeError(f"Ошибка при получении таблицы: {e}")
 
-def add_visitor_data(user_id, name, birth_date, phone, photo_url):
+def is_phone_registered(phone):
     sheet = get_sheet()
-    row = [user_id, name, birth_date, phone, photo_url, "Не использована"]
+    phones = sheet.col_values(4)
+    return phone in phones  # Если номер есть в списке, регистрация запрещена
 
+
+def add_visitor_data(user_id, full_name, birth_date, phone, photo_url, date):
+    if is_phone_registered(phone):
+        raise ValueError("Этот номер уже зарегистрирован!")
+    sheet = get_sheet()
+    row = [user_id, full_name, birth_date, phone, photo_url, date, "Не использована"]
     try:
         sheet.append_row(row)
         print("Данные успешно добавлены в Google Sheets.")
     except Exception as e:
         raise RuntimeError(f"Ошибка при добавлении данных: {e}")
-
