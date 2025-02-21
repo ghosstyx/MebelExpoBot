@@ -4,6 +4,7 @@ from config import GOOGLE_SHEET_ID
 import os
 
 
+
 def authorize_google_sheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
