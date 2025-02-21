@@ -1,6 +1,7 @@
 from datetime import datetime
 from aiogram import Router, F
 from aiogram.types import Message
+
 from loader import bot
 import re
 from aiogram.fsm.context import FSMContext
@@ -31,7 +32,7 @@ async def process_name(message: Message, state: FSMContext):
         return
 
     await state.update_data(name=message.text)
-    await message.answer("Введите вашу дату рождения (в формате DD.MM.YYYY):")
+    await message.answer("📅 Отлично! Теперь введите вашу дату рождения (в формате ДД.ММ.ГГГГ):")
     await state.set_state(RegisterState.birthdate)
 
 
@@ -43,7 +44,7 @@ async def process_birthdate(message: Message, state: FSMContext):
         return
 
     await state.update_data(birthdate=message.text)
-    await message.answer("Отправьте ваш номер телефона:", reply_markup=contact_keyboard)
+    await message.answer("📞 Почти готово! Отправьте свой контактный номер телефона (используйте кнопку ниже 👇).", reply_markup=contact_keyboard)
     await state.set_state(RegisterState.phone)
 
 
@@ -63,7 +64,7 @@ async def process_phone(message: Message, state: FSMContext):
         return
 
     await state.update_data(phone=message.contact.phone_number)
-    await message.answer("Теперь отправьте фото с нашим стендом.")
+    await message.answer("📸 Финальный шаг! Прикрепите селфи на фоне нашего стенда, чтобы подтвердить своё участие.")
     await state.set_state(RegisterState.photo)
 
 
@@ -87,5 +88,19 @@ async def process_photo(message: Message, state: FSMContext):
         await message.answer(str(e))
     except Exception as e:
         await message.answer(f"Ошибка при регистрации: {e}")
-    await message.answer("✅ Вы успешно зарегистрированы! Ваши данные обрабатываются. Ожидайте подтвердждения!")
+    await message.answer(f"""
+✅ Регистрация завершена!
+
+🎉 Вам присвоен уникальный номер: #{message.from_user.id}
+
+📌 Теперь вы можете воспользоваться скидкой 25%:
+🔹 Прямо на выставке (оформите накладную у менеджера).
+🔹 В наших шоурумах на Джами (https://yandex.uz/maps/-/CHuJQB8C) или Чинабаде (https://yandex.uz/maps/-/CHuJQU72) в течение трёх дней.
+
+📅 Срок действия скидки: с 25 по 27 февраля 2025 года.
+📢 Скидка не ограничена по количеству покупок!
+
+Спасибо за участие! Ждём вас за выгодными покупками. 🏆
+https://yandex.uz/maps/-/CHuJQB8C
+""")
     await state.clear()
